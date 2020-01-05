@@ -2,19 +2,20 @@ use std::env;
 use std::process;
 fn analyze_records(csv_path: String) -> Result<(), Box<dyn std::error::Error>> {
     let mut rdr = csv::Reader::from_path(csv_path)?;
-    let mut rampup_start = 0.0;
-    let mut rampup_end = 0.0;
+    let mut rampup_start = 0;
+    let mut rampup_end = 0;
     for result in rdr.records() {
         let record = result?;
-        if rampup_start == 0.0 {
-            rampup_start = record[0].parse::<f32>().unwrap();
+        let timestamp = record[0].parse::<u32>()?;
+        if rampup_start == 0 {
+            rampup_start = timestamp;
         }
 
         if &record[1] == "START" {
-            rampup_end = record[0].parse::<f32>().unwrap();
+            rampup_end = timestamp;
         }
     }
-    println!("{:01} second(s) ramping up", rampup_end - rampup_start);
+    println!("{:0} second(s) ramping up", rampup_end - rampup_start);
     Ok(())
 }
 fn main() {
